@@ -6,7 +6,7 @@ import UpgradeCard from "@/components/dashboard/upgradeCard";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-row">
-      <div className="flex flex-col h-[100vh] justify-between w-fit border-r gap-10 p-5">
+      <div className="flex flex-col h-[100vh] justify-between w-fit border-r gap-10 p-4 sticky top-0">
         <div className="flex flex-col gap-10 mx-auto">
           <Image
             src={JustPosLogo}
@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
         <UpgradeCard />
       </div>
-      <div className="w-screen">
+      <div className="w-screen min-h-screen">
         {children}
       </div>
     </div>
