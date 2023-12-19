@@ -63,12 +63,10 @@ async function getData(): Promise<Payment[]> {
   ]
 }
 
-export default async function DemoPage() {
+export default async function TransactionHistory() {
   const data = await getData()
 
   return (
-    <div className="h-[50vh] flex flex-col justify-between">
-      <DataTable columns={columns} data={data} />
-    </div>
+    <DataTable columns={columns} data={data} />
   )
 }
