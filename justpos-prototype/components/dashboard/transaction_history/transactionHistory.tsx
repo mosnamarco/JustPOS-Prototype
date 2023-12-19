@@ -1,72 +1,51 @@
-import { Payment, columns } from "./columns"
-import { DataTable } from "./data-table"
+import { Label } from "@/components/ui/label"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
-async function getData(): Promise<Payment[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-      customerName: "Majhda Kushmir",
-      modeOfPayment: "GCash"
-    },
-  ]
-}
+import React from 'react'
 
-export default async function TransactionHistory() {
-  const data = await getData()
-
+export default function TransactionHistory() {
   return (
-    <DataTable columns={columns} data={data} />
+    <div className="flex flex-col gap-4">
+      <Label htmlFor="transactions-table">Recent transactions</Label>
+      <div className="border rounded-lg" id="transactions-table">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell>Paid</TableCell>
+              <TableCell>Credit Card</TableCell>
+              <TableCell className="text-right">$250.00</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell>Paid</TableCell>
+              <TableCell>Credit Card</TableCell>
+              <TableCell className="text-right">$250.00</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell>Paid</TableCell>
+              <TableCell>Credit Card</TableCell>
+              <TableCell className="text-right">$250.00</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   )
 }
