@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import UpgradeCard from '@/components/dashboard/upgradeCard'
+import Navbar from '@/components/dashboard/navbar'
+import Image from 'next/image'
+import JustPosLogo from '@/public/images/JustPOS Logo.png'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,8 +21,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div>
-          {children}
+        <div className='flex flex-row'>
+          <div className="flex flex-col h-[100vh] justify-between w-fit border-r gap-10 p-4">
+            <div className="flex flex-col gap-10 mx-auto">
+              <Image
+                src={JustPosLogo}
+                alt="The just point of sales system logo"
+                width={150}
+              />
+              <Navbar />
+            </div>
+            <UpgradeCard />
+          </div>
+          <div className='w-full'>
+            {children}
+          </div>
         </div>
       </body>
     </html>
