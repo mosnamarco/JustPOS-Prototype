@@ -44,7 +44,7 @@ export default function Page() {
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      productName: "",
+      productImage: "",
     },
   })
 
@@ -52,7 +52,7 @@ export default function Page() {
     console.log(values)
     toast({
       title: "Item added",
-      description: "New item added to products list",
+      description: `${values.numberInStock} ${values.productName}(s) with the price of PHP ${values.price} was added to the products list`,
     })
 
     form.reset({
@@ -70,88 +70,7 @@ export default function Page() {
         <Button>Search</Button>
       </div>
       <div>
-        <Dialog>
-          <DialogTrigger className={buttonVariants({ variant: "default" })}>Add product</DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add a product</DialogTitle>
-              <DialogDescription>
-                Adding a product makes it available to be purchased or added to cart
-              </DialogDescription>
-            </DialogHeader>
-            <div>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <FormField
-                    control={form.control}
-                    name="productImage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product image</FormLabel>
-                        <FormControl>
-                          <Input type='file' {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Item preview image
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="productName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="product name" required {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          This name will be shown as the item label
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="numberInStock"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Number in stock</FormLabel>
-                        <FormControl>
-                          <Input type='number' placeholder="stock number" required {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Number available in stock
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Item price</FormLabel>
-                        <FormControl>
-                          <Input type='number' placeholder="Item price" required {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Item price
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit">Submit</Button>
-                </form>
-              </Form>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {AddProductForm(form, onSubmit)}
       </div>
       <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 gap-4 m-auto'>
         {Product()}
@@ -188,6 +107,95 @@ function Product() {
           <span>$14.59</span>
         </div>
       </div>
+    </>
+  )
+}
+
+function AddProductForm(form: any, onSubmit: any) {
+  return (
+    <>
+      <Dialog>
+        <DialogTrigger className={buttonVariants({ variant: "default" })}>Add product</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add a product</DialogTitle>
+            <DialogDescription>
+              Adding a product makes it available to be purchased or added to cart
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                  control={form.control}
+                  name="productImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product image</FormLabel>
+                      <FormControl>
+                        <Input type='file' {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Item preview image
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="productName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="product name" required {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        This name will be shown as the item label
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="numberInStock"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number in stock</FormLabel>
+                      <FormControl>
+                        <Input type='number' placeholder="stock number" required {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Number available in stock
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Item price</FormLabel>
+                      <FormControl>
+                        <Input type='number' placeholder="Item price" required {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Item price
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Submit</Button>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
