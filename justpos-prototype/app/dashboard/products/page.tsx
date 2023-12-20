@@ -29,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from 'react-hook-form'
 
 import * as z from 'zod'
+import { useEffect, useState } from 'react'
 
 const productSchema = z.object({
   productName: z.string(),
@@ -41,6 +42,14 @@ const productSchema = z.object({
 export default function Page() {
   const { toast } = useToast()
 
+  const [products, setProducts] = useState<z.infer<typeof productSchema>[]>([])
+
+  useEffect(() => {
+    const storedProducts = getProduct()
+    console.log(storedProducts)
+    setProducts(storedProducts)
+  }, [])
+
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -48,12 +57,33 @@ export default function Page() {
     },
   })
 
+  function getProduct() {
+    try {
+      const storedProducts = localStorage.getItem("PRODUCTS")
+      if (storedProducts === null) {
+        return []
+      }
+      return JSON.parse(storedProducts) as z.infer<typeof productSchema>[]
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
+  function addProduct(values: z.infer<typeof productSchema>) {
+    const newProducts = [...products, values]
+    setProducts(newProducts)
+    localStorage.setItem("PRODUCTS", JSON.stringify(newProducts))
+  }
+
   function onSubmit(values: z.infer<typeof productSchema>) {
     console.log(values)
     toast({
       title: "Item added",
       description: `${values.numberInStock} ${values.productName}(s) with the price of PHP ${values.price} was added to the products list`,
     })
+
+    addProduct(values)
 
     form.reset({
       productName: '',
@@ -73,27 +103,22 @@ export default function Page() {
         {AddProductForm(form, onSubmit)}
       </div>
       <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 gap-4 m-auto'>
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
-        {Product()}
+        {
+          products.map((item) => {
+            return (
+              Product(Date.now(), item.productName, item.price, item.numberInStock)
+            )
+          })
+        }
       </div>
     </div>
   )
 }
 
-function Product() {
+function Product(key: number, itemName: string, itemPrice: string, numberInStock: string) {
   return (
     <>
-      <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2'>
+      <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={key}>
         <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
           <span>Product image...</span>
         </div>
@@ -103,9 +128,10 @@ function Product() {
           <Badge variant="outline">Produce</Badge>
         </div>
         <div className='flex justify-between'>
-          <span>Shopaw</span>
-          <span>$14.59</span>
+          <span>{itemName}</span>
+          <span>${itemPrice}</span>
         </div>
+        <span>Item in stock: {numberInStock}</span>
       </div>
     </>
   )
