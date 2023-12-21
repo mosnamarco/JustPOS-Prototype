@@ -1,6 +1,5 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
 import { useToast } from "@/components/ui/use-toast"
 
 import {
@@ -46,7 +45,7 @@ export default function Page() {
 
   useEffect(() => {
     const storedProducts = getProduct()
-    console.log(storedProducts)
+    // console.log(storedProducts)
     setProducts(storedProducts)
   }, [])
 
@@ -121,11 +120,6 @@ function Product(key: number, itemName: string, itemPrice: string, numberInStock
       <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={key}>
         <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
           <span>Product image...</span>
-        </div>
-        <div className='grid grid-cols-3 gap-2'>
-          <Badge variant="outline">Beverage</Badge>
-          <Badge variant="outline">Food</Badge>
-          <Badge variant="outline">Produce</Badge>
         </div>
         <div className='flex justify-between'>
           <span>{itemName}</span>
