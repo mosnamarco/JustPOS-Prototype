@@ -32,16 +32,19 @@ import { useEffect, useState } from 'react'
 
 const productSchema = z.object({
   productName: z.string(),
-  numberInStock: z.string(),
-  price: z.string(),
-  productImage: z.string()
+  numberInStock: z.coerce.number(),
+  price: z.coerce.number(),
+  productImage: z.string(),
 })
 
+const productInfo = productSchema.extend({
+  id: z.number(),
+})
 
 export default function Page() {
   const { toast } = useToast()
 
-  const [products, setProducts] = useState<z.infer<typeof productSchema>[]>([])
+  const [products, setProducts] = useState<z.infer<typeof productInfo>[]>([])
 
   useEffect(() => {
     const storedProducts = getProduct()
@@ -62,36 +65,86 @@ export default function Page() {
       if (storedProducts === null) {
         return []
       }
-      return JSON.parse(storedProducts) as z.infer<typeof productSchema>[]
+      return JSON.parse(storedProducts) as z.infer<typeof productInfo>[]
     } catch (error) {
       console.log(error)
       return []
     }
   }
 
-  function addProduct(values: z.infer<typeof productSchema>) {
+  function addProduct(values: z.infer<typeof productInfo>) {
     const newProducts = [...products, values]
     setProducts(newProducts)
     localStorage.setItem("PRODUCTS", JSON.stringify(newProducts))
   }
 
+  function deleteProduct(id: number) {
+    const products = JSON.parse(localStorage.getItem("PRODUCTS")!) as z.infer<typeof productInfo>[]
+    const indexToDelete = products.findIndex(obj => obj.id === id)
+    if (indexToDelete !== -1 ) {
+      products.splice(indexToDelete, 1)
+    } else {
+      console.log(`Product with id ${id} does not exist`)
+    }
+    setProducts(products)
+    localStorage.setItem("PRODUCTS", JSON.stringify(products))
+
+    toast({
+      title: `Item ${id} was deleted`
+    })
+  }
+
   function onSubmit(values: z.infer<typeof productSchema>) {
-    console.log(values)
     toast({
       title: "Item added",
       description: `${values.numberInStock} ${values.productName}(s) with the price of PHP ${values.price} was added to the products list`,
     })
 
-    addProduct(values)
+    const productInfo = {...values, id: Date.now()}
+    addProduct(productInfo)
 
     form.reset({
-      productName: '',
-      numberInStock: '',
-      price: '',
       productImage: '',
+      productName: '',
+      numberInStock: 0,
+      price: 0,
     })
   }
+  
+  function product(key: number, itemName: string, itemPrice: number, numberInStock: number) {
+    return (
+      <>
+        <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={key}>
+          <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
+            <span>Product image...</span>
+          </div>
+          <div className='flex justify-between'>
+            <span>{itemName}</span>
+            <span>$ {itemPrice}</span>
+          </div>
+          <div className="grid col-1 gap-4">
+            <span className="text-[gray]">In stock: {numberInStock}</span>
+            {confirmDelete(key)}
+          </div>
+        </div>
+      </>
+    )
+  }
 
+  function confirmDelete(key: number) {
+    return (
+      <>
+        <Dialog>
+          <DialogTrigger className={buttonVariants({ variant: "destructive" })}>Delete product</DialogTrigger>
+          <DialogContent>
+            <DialogDescription>If you delete a product, it cannot be recovered</DialogDescription>
+            <Button variant="destructive" onClick={() => deleteProduct(key)}>Delete anyway</Button>
+          </DialogContent>
+        </Dialog>
+      </>
+    )
+  }
+  
   return (
     <div className='flex flex-col m-4 gap-4 text-center'>
       <div className='flex gap-2'>
@@ -105,7 +158,7 @@ export default function Page() {
         {
           products.map((item) => {
             return (
-              Product(Date.now(), item.productName, item.price, item.numberInStock)
+              product(item.id, item.productName, item.price, item.numberInStock)
             )
           })
         }
@@ -114,22 +167,7 @@ export default function Page() {
   )
 }
 
-function Product(key: number, itemName: string, itemPrice: string, numberInStock: string) {
-  return (
-    <>
-      <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={key}>
-        <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
-          <span>Product image...</span>
-        </div>
-        <div className='flex justify-between'>
-          <span>{itemName}</span>
-          <span>${itemPrice}</span>
-        </div>
-        <span>Item in stock: {numberInStock}</span>
-      </div>
-    </>
-  )
-}
+
 
 function AddProductForm(form: any, onSubmit: any) {
   return (
@@ -185,7 +223,7 @@ function AddProductForm(form: any, onSubmit: any) {
                     <FormItem>
                       <FormLabel>Number in stock</FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder="stock number" required {...field} />
+                        <Input type='string' placeholder="stock number" required {...field} />
                       </FormControl>
                       <FormDescription>
                         Number available in stock
