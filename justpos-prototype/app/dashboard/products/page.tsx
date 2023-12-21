@@ -47,6 +47,9 @@ export default function Page() {
     resolver: zodResolver(productSchema),
     defaultValues: {
       productImage: "",
+      productName: "",
+      price: 0,
+      numberInStock: 0,
     },
   })
 
@@ -63,8 +66,8 @@ export default function Page() {
     }
   }
 
-  function addProduct(values: z.infer<typeof productInfo>) {
-    const newProducts = [...products, values]
+  function addProduct(item: z.infer<typeof productInfo>) {
+    const newProducts = [...products, item]
     setProducts(newProducts)
     localStorage.setItem("PRODUCTS", JSON.stringify(newProducts))
   }
@@ -72,7 +75,7 @@ export default function Page() {
   function deleteProduct(id: number) {
     const products = JSON.parse(localStorage.getItem("PRODUCTS")!) as z.infer<typeof productInfo>[]
     const indexToDelete = products.findIndex(obj => obj.id === id)
-    if (indexToDelete !== -1 ) {
+    if (indexToDelete !== -1) {
       products.splice(indexToDelete, 1)
     } else {
       console.log(`Product with id ${id} does not exist`)
@@ -91,7 +94,7 @@ export default function Page() {
       description: `${values.numberInStock} ${values.productName}(s) with the price of PHP ${values.price} was added to the products list`,
     })
 
-    const productInfo = {...values, id: Date.now()}
+    const productInfo = { ...values, id: Date.now() }
     addProduct(productInfo)
 
     form.reset({
@@ -101,22 +104,20 @@ export default function Page() {
       price: 0,
     })
   }
-  
-  function product(item: z.infer<typeof productInfo>) {
+
+  function product(item: z.infer<typeof productInfo>, index: number) {
     return (
       <>
-        <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={item.id}>
-          <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
-            <span>Product image...</span>
-          </div>
-          <div className='flex justify-between'>
-            <span>{item.productName}</span>
-            <span>$ {item.price}</span>
-          </div>
-          <div className="grid col-1 gap-4">
-            <span className="text-[gray]">In stock: {item.numberInStock}</span>
-            {confirmDelete(item.id)}
-          </div>
+        <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
+          <span>Product image...</span>
+        </div>
+        <div className='flex justify-between'>
+          <span>{item.productName}</span>
+          <span>PHP {item.price}</span>
+        </div>
+        <div className="grid col-1 gap-4">
+          <span className="text-[gray]">In stock: {item.numberInStock}</span>
+          {confirmDelete(item.id)}
         </div>
       </>
     )
@@ -135,7 +136,7 @@ export default function Page() {
       </>
     )
   }
-  
+
   return (
     <div className='flex flex-col m-4 gap-4 text-center'>
       <div className='flex gap-2'>
@@ -147,9 +148,11 @@ export default function Page() {
       </div>
       <div className='flex flex-wrap gap-4 justify-center'>
         {
-          products.map((item) => {
+          products.map((item, index) => {
             return (
-              product(item)
+              <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={`${item.id}_${index}`}>
+                {product(item, index)}
+              </div>
             )
           })
         }
