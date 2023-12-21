@@ -10,3 +10,9 @@ export const productSchema = z.object({
 export const productInfo = productSchema.extend({
   id: z.number(),
 })
+
+export const orderSchema = z.object({
+  id: z.number(),
+  products: z.array(productSchema),
+  // orderDate: z.date()
+})

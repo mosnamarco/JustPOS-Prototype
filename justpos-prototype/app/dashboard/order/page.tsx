@@ -1,14 +1,17 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { productInfo } from '@/lib/inferredTypes'
+import { orderSchema, productInfo } from '@/lib/inferredTypes'
 import * as z from 'zod'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
+import { toast } from '@/components/ui/use-toast'
 
 export default function Page() {
   const [products, setProducts] = useState<z.infer<typeof productInfo>[]>([])
   const [cartItems, setCartItems] = useState<z.infer<typeof productInfo>[]>([])
+  const [orders, setOrders] = useState<z.infer<typeof orderSchema>[]>([])
+  const [orderPlaced, setOrderPlaced] = useState<boolean>(false)
 
   useEffect(() => {
     const storedProducts = getProduct()
@@ -62,11 +65,37 @@ export default function Page() {
     localStorage.setItem("CART_ITEMS", JSON.stringify(newCart))
   }
 
+  const processOrder = () => {
+    const newOrder: z.infer<typeof orderSchema> = {
+      id: Date.now(),
+      products: cartItems
+    }
+
+    const newOrders = [...orders, newOrder]
+    setOrders(newOrders)
+
+    localStorage.setItem("ORDER_HISTORY", JSON.stringify(newOrders))
+
+    setOrderPlaced(true)
+
+    toast({
+      title: "Order processed",
+      description: `Order with the ID:${newOrder.id} has been processed`,
+    })
+  }
+
+  const createNewOrder = () => {
+    setCartItems([])
+    setOrderPlaced(false)
+    localStorage.removeItem("CART_ITEMS")
+    console.log(orderPlaced)
+  }
+
   const confirmOrder = () => {
     return (
       <>
         <Dialog>
-          <DialogTrigger disabled={cartItems.length <= 0} className={buttonVariants({ variant: "default", size: "lg" })}>Confirm order</DialogTrigger>
+          <DialogTrigger disabled={cartItems.length <= 0 || orderPlaced} className={buttonVariants({ variant: "default", size: "lg" })}>Confirm order</DialogTrigger>
           <DialogContent>
             <DialogDescription>Check if order is accurate</DialogDescription>
             <div className='overflow-y-scroll max-h-[600px] p-4 grid gap-4'>
@@ -87,7 +116,7 @@ export default function Page() {
                   return acc + obj.price
                 }, 0)
               }</span>
-              <Button className='w-full'>Process order</Button>
+              <Button className='w-full' onClick={() => processOrder()} disabled={orderPlaced}>Process order</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -149,8 +178,9 @@ export default function Page() {
             return acc + obj.price
           }, 0)
         }</span>
-        <div>
+        <div className='grid gap-4'>
           {confirmOrder()}
+          <Button className='w-full' disabled={!orderPlaced} onClick={() => createNewOrder()}>Create new order</Button>
         </div>
       </div>
     </>
