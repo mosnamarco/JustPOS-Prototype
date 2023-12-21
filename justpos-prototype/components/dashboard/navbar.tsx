@@ -1,24 +1,16 @@
+'use client'
+
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { buttonVariants } from "@/components/ui/button"
 
 export default function Navbar() {
   return (
-    <div className="flex flex-col w-[10rem]">
-      <Button variant={"ghost"}>
-        <Link href="/dashboard">Home</Link>
-      </Button>
-      <Button variant={"ghost"}>
-        <Link href="/dashboard/invoice">Invoice</Link>
-      </Button>
-      <Button variant={"ghost"}>
-        <Link href="/dashboard/order">Create order</Link>
-      </Button>
-      <Button variant={"ghost"}>
-        <Link href="/dashboard/analytics">Analytics</Link>
-      </Button>
-      <Button variant={"ghost"}>
-        <Link href="/dashboard/products">Products</Link>
-      </Button>
+    <div className="flex flex-col w-[10rem] gap-4">
+      <Link href="/dashboard" className={buttonVariants({ variant: "ghost" })}>Home</Link>
+      {/* <Link href="/dashboard/invoice" className={buttonVariants({ variant: "ghost" })}>Invoice</Link> */}
+      <Link href="/dashboard/order" className={buttonVariants({ variant: "ghost" })}>Create order</Link>
+      {/* <Link href="/dashboard/analytics" className={buttonVariants({ variant: "ghost" })}>Analytics</Link> */}
+      <Link href="/dashboard/products" className={buttonVariants({ variant: "ghost" })}>Products</Link>
     </div>
   )
 }
