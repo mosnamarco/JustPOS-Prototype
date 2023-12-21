@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { productInfo } from '@/lib/inferredTypes'
 import * as z from 'zod'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 
 export default function Page() {
   const [products, setProducts] = useState<z.infer<typeof productInfo>[]>([])
@@ -61,6 +62,39 @@ export default function Page() {
     localStorage.setItem("CART_ITEMS", JSON.stringify(newCart))
   }
 
+  const confirmOrder = () => {
+    return (
+      <>
+        <Dialog>
+          <DialogTrigger disabled={cartItems.length <= 0} className={buttonVariants({ variant: "default", size: "lg" })}>Confirm order</DialogTrigger>
+          <DialogContent>
+            <DialogDescription>Check if order is accurate</DialogDescription>
+            <div className='overflow-y-scroll max-h-[600px] p-4 grid gap-4'>
+              <div>
+                {cartItems.map((obj, index) => {
+                  return (
+                    <div key={`${obj.id}_${index}`}>
+                      <div className='flex justify-between w'>
+                        <span>{obj.productName}</span>
+                        <span>PHP {obj.price}</span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              <span className='text-lg'>Total (without tax): PHP {
+                cartItems.reduce((acc: number, obj: z.infer<typeof productInfo>) => {
+                  return acc + obj.price
+                }, 0)
+              }</span>
+              <Button className='w-full'>Process order</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    )
+  }
+
   const product = (item: z.infer<typeof productInfo>) => {
     return (
       <>
@@ -116,7 +150,7 @@ export default function Page() {
           }, 0)
         }</span>
         <div>
-          <Button className='w-full'>Confirm order</Button>
+          {confirmOrder()}
         </div>
       </div>
     </>
