@@ -30,16 +30,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useEffect, useState } from 'react'
 
-const productSchema = z.object({
-  productName: z.string(),
-  numberInStock: z.coerce.number(),
-  price: z.coerce.number(),
-  productImage: z.string(),
-})
-
-const productInfo = productSchema.extend({
-  id: z.number(),
-})
+import { productInfo, productSchema } from "@/lib/inferredTypes"
 
 export default function Page() {
   const { toast } = useToast()
@@ -111,20 +102,20 @@ export default function Page() {
     })
   }
   
-  function product(key: number, itemName: string, itemPrice: number, numberInStock: number) {
+  function product(item: z.infer<typeof productInfo>) {
     return (
       <>
-        <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={key}>
+        <div className='flex flex-col p-4 border border-1 rounded-lg w-max gap-2' key={item.id}>
           <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
             <span>Product image...</span>
           </div>
           <div className='flex justify-between'>
-            <span>{itemName}</span>
-            <span>$ {itemPrice}</span>
+            <span>{item.productName}</span>
+            <span>$ {item.price}</span>
           </div>
           <div className="grid col-1 gap-4">
-            <span className="text-[gray]">In stock: {numberInStock}</span>
-            {confirmDelete(key)}
+            <span className="text-[gray]">In stock: {item.numberInStock}</span>
+            {confirmDelete(item.id)}
           </div>
         </div>
       </>
@@ -154,11 +145,11 @@ export default function Page() {
       <div>
         {AddProductForm(form, onSubmit)}
       </div>
-      <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 gap-4 m-auto'>
+      <div className='flex flex-wrap gap-4 justify-center'>
         {
           products.map((item) => {
             return (
-              product(item.id, item.productName, item.price, item.numberInStock)
+              product(item)
             )
           })
         }
