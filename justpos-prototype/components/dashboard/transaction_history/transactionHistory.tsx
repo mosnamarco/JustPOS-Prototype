@@ -1,3 +1,5 @@
+'use client'
+
 import { Label } from "@/components/ui/label"
 import {
   Table,
@@ -7,44 +9,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-import React from 'react'
+import { orderSchema } from "@/lib/inferredTypes"
+import { Separator } from '@/components/ui/separator'
+import React, { useEffect, useState } from 'react'
+import * as z from 'zod'
 
 export default function TransactionHistory() {
+  const [completedOrders, setCompletedOrders] = useState<z.infer<typeof orderSchema>[]>([])
+
+  useEffect(() => {
+    const storedCompletedOrders = getSuccessfulOrders()
+    setCompletedOrders(storedCompletedOrders)
+  }, [])
+
+  const getSuccessfulOrders = () => {
+    try {
+      const storedCompletedOrders = localStorage.getItem("COMPLETED_ORDERS")
+      if (storedCompletedOrders === null) {
+        return []
+      }
+      return JSON.parse(storedCompletedOrders) as z.infer<typeof orderSchema>[]
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-[400px]">
       <Label htmlFor="transactions-table">Recent transactions</Label>
-      <div className="border rounded-lg" id="transactions-table">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Invoice</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">INV001</TableCell>
-              <TableCell>Paid</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell className="text-right">$250.00</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">INV001</TableCell>
-              <TableCell>Paid</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell className="text-right">$250.00</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">INV001</TableCell>
-              <TableCell>Paid</TableCell>
-              <TableCell>Credit Card</TableCell>
-              <TableCell className="text-right">$250.00</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <div className="flex justify-between p-4 border rounded-lg">
+        <span>Transaction ID</span>
+        <span>Status</span>
+      </div>
+      <Separator />
+      <div className="border rounded-lg h-full overflow-y-scroll" id="transactions-table">
+        {
+          completedOrders.map((item, index) => {
+            return (
+              <div key={`${item.id}_${index}`} className="flex justify-between p-4">
+                <span>{item.id}</span>
+                <span className="font-bold">Successful</span>
+              </div>
+            )
+          })
+        }
       </div>
     </div>
   )
