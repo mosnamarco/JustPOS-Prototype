@@ -17,14 +17,11 @@ export default function UpgradeCard() {
           Upgrade now!!!
         </CardTitle>
         <CardDescription>
-          If you upgrade, you get access to advanced analytics!
+          Upgrade now to analize your sales and track your revenue
         </CardDescription>
-        <CardContent>
-          <h1>Insert advanced analytics here</h1>
-        </CardContent>
       </CardHeader>
       <CardFooter>
-        <Button>UPGRADE</Button>
+        <Button className="w-full">UPGRADE</Button>
       </CardFooter>
      </Card> 
     </div>

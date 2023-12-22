@@ -23,10 +23,14 @@ import { useRouter } from "next/navigation"
 export default function Page({ params }: { params: { slug: string } }) {
   const router = useRouter()
   const [order, setOrder] = useState<z.infer<typeof orderSchema>>()
+  const [completedOrders, setCompletedOrders] = useState<z.infer<typeof orderSchema>[]>([])
   const [disable, setDisable] = useState<boolean>(false)
 
   useEffect(() => {
     const storedOrderHistory = JSON.parse(localStorage.getItem("ORDER_HISTORY")!) as z.infer<typeof orderSchema>[]
+    const storedCompletedOrders = getSuccessfulOrders()
+
+    setCompletedOrders(storedCompletedOrders)
     getOrder(storedOrderHistory, params.slug)
   }, [])
 
@@ -39,6 +43,34 @@ export default function Page({ params }: { params: { slug: string } }) {
     })
 
     return null
+  }
+
+  const getSuccessfulOrders = () => {
+    try {
+      const storedCompletedOrders = localStorage.getItem("COMPLETED_ORDERS")
+      if (storedCompletedOrders === null) {
+        return []
+      }
+      return JSON.parse(storedCompletedOrders) as z.infer<typeof orderSchema>[]
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
+  const saveOrder = async () => {
+    const newCompletedOrders = [...completedOrders, order!]
+    setCompletedOrders(newCompletedOrders)
+    localStorage.setItem("COMPLETED_ORDERS", JSON.stringify(newCompletedOrders))
+
+    toast({
+      title: "Order confirmed",
+      description: "Thank you for placing an order, now redirecting you home page"
+    })
+
+    setDisable(true)
+
+    router.push(`/dashboard/`)
   }
 
   const confirmPayment = () => {
@@ -61,28 +93,6 @@ export default function Page({ params }: { params: { slug: string } }) {
         </AlertDialogContent>
       </AlertDialog>
     )
-  }
-
-  const saveOrder = async () => {
-
-    toast({
-      title: "Order confirmed",
-      description: "Thank you for placing an order, now redirecting you home page"
-    })
-
-    setDisable(true)
-
-    await waitOneSecond()
-
-    router.push(`/dashboard/`)
-  }
-
-  function waitOneSecond(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 2000); // Delay of 1000 milliseconds (1 second)
-    });
   }
 
   return (
