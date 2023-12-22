@@ -12,7 +12,7 @@ export const productInfo = productSchema.extend({
 })
 
 export const orderSchema = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
   products: z.array(productSchema),
   // orderDate: z.date()
 })

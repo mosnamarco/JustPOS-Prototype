@@ -6,19 +6,24 @@ import * as z from 'zod'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Page() {
+  const router = useRouter()
   const [products, setProducts] = useState<z.infer<typeof productInfo>[]>([])
   const [cartItems, setCartItems] = useState<z.infer<typeof productInfo>[]>([])
-  const [orders, setOrders] = useState<z.infer<typeof orderSchema>[]>([])
-  const [orderPlaced, setOrderPlaced] = useState<boolean>(false)
+  const [orders, setOrderHistory] = useState<z.infer<typeof orderSchema>[]>([])
+  const [orderPlaced, setOrderPlaced] = useState<boolean>()
 
   useEffect(() => {
     const storedProducts = getProduct()
     const storedCartItems = getCartItems()
+    const storedOrderHistory = getOrderHistory()
 
     setProducts(storedProducts)
     setCartItems(storedCartItems)
+    setOrderHistory(storedOrderHistory)
   }, [])
 
   function getProduct() {
@@ -65,6 +70,19 @@ export default function Page() {
     localStorage.setItem("CART_ITEMS", JSON.stringify(newCart))
   }
 
+  const getOrderHistory = () => {
+    try {
+      const storedOrderHistory = localStorage.getItem("ORDER_HISTORY")
+      if (storedOrderHistory === null) {
+        return []
+      }
+      return JSON.parse(storedOrderHistory) as z.infer<typeof orderSchema>[]
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
+
   const processOrder = () => {
     const newOrder: z.infer<typeof orderSchema> = {
       id: Date.now(),
@@ -72,16 +90,20 @@ export default function Page() {
     }
 
     const newOrders = [...orders, newOrder]
-    setOrders(newOrders)
+    setOrderHistory(newOrders)
 
     localStorage.setItem("ORDER_HISTORY", JSON.stringify(newOrders))
 
     setOrderPlaced(true)
+    setCartItems([])
+    localStorage.removeItem("CART_ITEMS")
 
     toast({
-      title: "Order processed",
-      description: `Order with the ID:${newOrder.id} has been processed`,
+      title: "Order processing",
+      description: `Order with the ID:${newOrder.id} is now being processed`,
     })
+
+    router.push(`/dashboard/order/process/${newOrder.id}`)
   }
 
   const createNewOrder = () => {
@@ -116,7 +138,7 @@ export default function Page() {
                   return acc + obj.price
                 }, 0)
               }</span>
-              <Button className='w-full' onClick={() => processOrder()} disabled={orderPlaced}>Process order</Button>
+              <Button className='w-full' onClick={() => processOrder()} disabled={orderPlaced}>Place order</Button>
             </div>
           </DialogContent>
         </Dialog>
