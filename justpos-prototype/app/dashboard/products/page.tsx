@@ -109,7 +109,7 @@ export default function Page() {
     return (
       <>
         <div className='border border-1 rounded-md h-[200px] w-[200px] m-auto flex flex-col justify-center text-center'>
-          <span>Product image...</span>
+          <span className="text-[gray]">Product image...</span>
         </div>
         <div className='flex justify-between'>
           <span>{item.productName}</span>
